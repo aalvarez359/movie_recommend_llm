@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Top 10 Recommendations</title>
+  <script>
+    async function sendFeedback(title, overview, genres, label) {
+      await fetch("/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `title=${encodeURIComponent(title)}&overview=${encodeURIComponent(overview)}&genres=${encodeURIComponent(genres)}&label=${label}`
+      });
+    }
+  </script>
+</head>
+<body>
+  <h2>Top 10 Movies Similar to "{{ movie_title }}"</h2>
+  <p><strong>You said:</strong> {{ user_input }}</p>
+
+  {% for idx, row in results.iterrows() %}
+    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+      <h3>{{ row['title'] }}</h3>
+      <p><strong>Genre:</strong> {{ row['genre_words'] }}</p>
+      <p>{{ row['overview'] }}</p>
+      <button onclick="sendFeedback('{{ row['title'] }}', '{{ row['overview'] }}', '{{ row['genre_words'] }}', 'like')">👍 Like</button>
+      <button onclick="sendFeedback('{{ row['title'] }}', '{{ row['overview'] }}', '{{ row['genre_words'] }}', 'dislike')">👎 Dislike</button>
+      <button>⏭ Skip</button>
+    </div>
+  {% endfor %}
+
+  <form action="/update" method="get">
+    <button type="submit">🔁 Update List</button>
+  </form>
+
+  <form action="/clear" method="get" style="margin-top: 10px;">
+	<button type="submit">🧹 Clear Likes</button>
+  </form>
+
+  <a href="/">🔙 Back to Home</a>
+</body>
+</html>
+
